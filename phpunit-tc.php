@@ -8,7 +8,6 @@ class TeamCity_PHPUnit_Framework_TestListener
     {
         self::printText("\n##teamcity[$eventName");
         foreach ($params as $key => $value) {
-            //self::printText(" ");
             self::printText(" $key='$value'");
         }
         self::printText("]\n");
@@ -128,12 +127,13 @@ class TeamCity_PHPUnit_Framework_TestListener
     {
         $testName = $test->getName();
         $params = array(
-            "name" => $testName
+            "name" => $testName,
+            "captureStandardOutput" => "true"
         );
         if ($test instanceof PHPUnit_Framework_TestCase) {
             $className = get_class($test);
             $fileName = self::getFileName($className);
-            $params['locationHint'] = "php_qn://$fileName::\\$className::$testName";
+            $params['locationHint'] = "file://$fileName::\\$className::$testName";
         }
         self::printEvent("testStarted", $params);
     }
@@ -157,7 +157,7 @@ class TeamCity_PHPUnit_Framework_TestListener
         );
         if (class_exists($suiteName, false)) {
             $fileName = self::getFileName($suiteName);
-            $params['locationHint'] = "php_qn://$fileName::\\$suiteName";
+            $params['locationHint'] = "file://$fileName::\\$suiteName";
         }
         self::printEvent("testSuiteStarted", $params);
     }
@@ -187,11 +187,14 @@ class TeamCity_PHPUnit_TextUI_Command
     protected function handleArguments(array $argv)
     {
         parent::handleArguments($argv);
+
+        // Add listener which reports to TeamCity using service messages
         $this->arguments['listeners'][] = new TeamCity_PHPUnit_Framework_TestListener();
     }
 
     protected function createRunner()
     {
+        // Disable coverage on the current file
         $coverage_Filter = new PHP_CodeCoverage_Filter();
         $coverage_Filter->addFileToBlacklist(__FILE__);
         $runner = new PHPUnit_TextUI_TestRunner($this->arguments['loader'], $coverage_Filter);
