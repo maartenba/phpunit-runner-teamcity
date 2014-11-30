@@ -125,7 +125,7 @@ class TeamCity_PHPUnit_Framework_TestListener
     
     public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
-        self::printEvent("testSkipped", array(
+        self::printEvent("testIgnored", array(
             "name" => $test->getName(),
             "message" => self::getMessage($e),
             "details" => self::getDetails($e)
