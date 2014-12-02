@@ -122,6 +122,15 @@ class TeamCity_PHPUnit_Framework_TestListener
             "details" => self::getDetails($e)
         ));
     }
+    
+    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    {
+        self::printEvent("testIgnored", array(
+            "name" => $test->getName(),
+            "message" => self::getMessage($e),
+            "details" => self::getDetails($e)
+        ));
+    }
 
     public function startTest(PHPUnit_Framework_Test $test)
     {
